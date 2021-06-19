@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   <style>
@@ -12,8 +12,8 @@
       background-color: gray;
     }
   </style>
-  <script src="/svg-ac-inst.js"></script>
-  <script src="/lr.js"></script>
+  <script src="../../svg-ac-inst.js"></script>
+  <script src="../../lr.js"></script>
 </head>
 <body>
 <div id='panel' class='container grayBk'>
@@ -82,13 +82,13 @@
 
     var index      = 0;
     var turn_rate  = 0;
-    var turn_alpha = 0.01;
+    var turn_alpha = 0.02;
     function run(timestamp) {
       var a = flight1[index];
 
       turn_rate = turn_rate + ((a[4] - turn_rate) * turn_alpha);
       attitude.set(a[1],-a[2]);
-      heading.set(a[3]);
+      heading.set(a[3]); 
       turn.set(turn_rate,a[5]);
       altimeter.set(a[6]);
       airspeed.set(a[7]* (3600/6076));
