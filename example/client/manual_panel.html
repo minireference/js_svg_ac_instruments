@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <style>
+    .blackBk {
+      background-color:black;
+    }
+    .grayBk {
+      background-color: gray;
+    }
+  </style>
+  <script src="/svg-ac-inst.js"></script>
+  <script src="/lr.js"></script>
+</head>
+<body>
+<div id='panel' class='container grayBk'>
+  <div class="row">
+    &nbsp;
+  </div>
+  <div class="row">
+    <div id="a1" class="grayBk col-md-4 col-xs-4">
+      <!-- @include airspeed.svg -->
+    </div>
+    <div id='a2' class="grayBk col-md-4 col-xs-4">
+      <!-- @include attitude.svg -->
+    </div>
+    <div id='a3' class="grayBk col-md-4 col-xs-4">
+      <!-- @include altimeter.svg -->
+    </div>
+  </div>
+  <div class="row">
+    &nbsp;
+  </div>
+  <div class="row">
+    <div id="b1" class="grayBk col-md-4 col-xs-4">
+      <!-- @include turn.svg -->
+    </div>
+    <div id='b2' class="grayBk col-md-4 col-xs-4">
+      <!-- @include heading.svg -->
+    </div>
+    <div id='b3' class="grayBk col-md-4 col-xs-4">
+      <!-- @include vsi.svg -->
+    </div>
+  </div>
+  <div class="row">
+    &nbsp;
+  </div>
+</div>
+
+<script>
+  var module = (function() {
+
+    // instantiate the airspeed indicator, give it the name that matches the template
+    var airspeed_options =
+    {
+      range  : 220,         // range index, 1 = 220
+      green  :[80,140],     // green arc from clean stall to max cruise
+      yellow :[140,160],    // yellow arc from max cruise to never-exceed
+      red    :160,          // red arc from never-exceed to never-exceed
+      white  :[50,100]      // white arc for stall-flaps to max-flaps
+    }
+    var airspeed = svg_ac_inst.Airspeed(document.querySelector("#a1"),"gg145-airspeed",true,airspeed_options);
+
+    //  instantiate the attitude indicator, give it the name that matches the template -->
+    var attitude = svg_ac_inst.Attitude(document.querySelector('#a2'),"gg145-attitude",true);
+
+    // instantiate the altimeter, give it the name that matches the template -->
+    var altimeter = svg_ac_inst.Altimeter(document.querySelector("#a3"),"gg145-altimeter",true);
+    altimeter.setPressure(29.92);
+
+    // instantiate the turn coordinator, give it the name that matches the template -->
+    var turn = svg_ac_inst.Turn(document.querySelector('#b1'),"gg145-turn",true);
+
+    // instantiate the heading indicator, give it the name that matches the template -->
+    var heading = svg_ac_inst.Heading(document.querySelector("#b2"),"gg145-heading",true);
+
+    // instantiate the VSI, give it the name that matches the template -->
+    var vsi = svg_ac_inst.VSI(document.querySelector("#b3"),"gg145-vsi",true);
+
+    
+    function run(timestamp) {
+
+      // speed in knots
+      airspeed.set(200);
+
+      // set to 10 climb, and 20 bank to left
+      attitude.set(10, -20);
+
+      // headed NE
+      heading.set(45); 
+
+      // turn rate in 4 deg/sec and accel -10 ??
+      turn.set(-4, -10);
+
+      // 2000m
+      altimeter.set(350);
+
+      // ascending at 100 ft/min
+      vsi.set(100);
+
+      // start gauges running
+      requestAnimationFrame(run);
+    }
+
+
+    var cols = ['a1','a2','a3','b1','b2','b3'];
+    var img  = [airspeed,attitude,altimeter,turn,heading,vsi];
+    function ready() {
+      var elements = [];
+      cols.forEach(function(v,i,a) {
+        var e = $('#' + v);
+        elements.push({div:e,svg:img[i]});
+      })
+      return elements;
+    }
+
+    function resize(elements) {
+      elements.forEach(function(v,i,a) {
+        var d = v.div;
+        var s = v.svg;
+        var w = d.width();
+        s.resize(w);
+      });
+    }
+
+    return {
+      resize : resize,
+      ready  : ready,
+      run    : run
+    };
+  })();
+
+  $(document).ready(function() {
+    var elements = module.ready();
+    module.resize(elements);
+    $(window).on('resize',function() {
+      module.resize(elements);
+    });
+
+    // start sim
+    requestAnimationFrame(module.run);
+  });
+
+</script>
+</body>
+</html>
